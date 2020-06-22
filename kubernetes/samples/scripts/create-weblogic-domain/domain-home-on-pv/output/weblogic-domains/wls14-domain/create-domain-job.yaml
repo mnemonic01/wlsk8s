@@ -1,0 +1,100 @@
+# Copyright (c) 2018, 2020, Oracle Corporation and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: wls14-domain-create-weblogic-sample-domain-job
+  namespace: default 
+spec:
+  template:
+    metadata:
+      annotations:
+        sidecar.istio.io/inject: "false"
+      labels:
+        weblogic.resourceVersion: domain-v2
+        weblogic.domainUID: wls14-domain
+        weblogic.domainName: wls14-domain
+        app: wls14-domain-create-weblogic-sample-domain-job
+    spec:
+      restartPolicy: Never
+      initContainers:
+        - name: fix-pvc-owner
+          image: fra.ocir.io/frce4kd4ndqf/oracle/weblogic:14.1.1.0-generic
+          command: ["sh", "-c", "chown -R 1000:1000 /scratch"]
+          volumeMounts:
+          - name: weblogic-sample-domain-storage-volume
+            mountPath: /scratch
+          securityContext:
+            runAsUser: 0
+            runAsGroup: 0
+      containers:
+        - name: create-weblogic-sample-domain-job
+          image: fra.ocir.io/frce4kd4ndqf/oracle/weblogic:14.1.1.0-generic
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 7001
+          volumeMounts:
+          - mountPath: /u01/weblogic
+            name: create-weblogic-sample-domain-job-cm-volume
+          - mountPath: /scratch
+            name: weblogic-sample-domain-storage-volume
+          - mountPath: /weblogic-operator/secrets
+            name: weblogic-credentials-volume
+          command: ["/bin/sh"]
+          args: ["/u01/weblogic/create-domain-job.sh"]
+          env:
+            - name: DOMAIN_UID
+              value: "wls14-domain"
+            - name: DOMAIN_NAME
+              value: "wls14-domain"
+            - name: ADMIN_SERVER_NAME
+              value: "admin-server"
+            - name: ADMIN_SERVER_NAME_SVC
+              value: "admin-server"
+            - name: ADMIN_PORT
+              value: "7001"
+            - name: CLUSTER_NAME
+              value: "cluster-1"
+            - name: CLUSTER_TYPE
+              value: "DYNAMIC"
+            - name: T3_CHANNEL_PORT
+              value: "30012"
+            - name: T3_PUBLIC_ADDRESS
+              value: ""
+            - name: MANAGED_SERVER_NAME_BASE_SVC
+              value: "managed-server"
+            - name: MANAGED_SERVER_NAME_BASE
+              value: "managed-server"
+            - name: CONFIGURED_MANAGED_SERVER_COUNT
+              value: "5"
+            - name: MANAGED_SERVER_PORT
+              value: "8001"
+            - name: PRODUCTION_MODE_ENABLED
+              value: "true"
+            - name: CREATE_DOMAIN_SCRIPT_DIR
+              value: "/u01/weblogic"
+            - name: DOMAIN_ROOT_DIR
+              value: "/scratch"
+            - name: DOMAIN_HOME_DIR
+              value: "/scratch/domains/wls14-domain"
+            - name: DOMAIN_LOGS_DIR
+              value: "/scratch/logs/wls14-domain"
+            - name: ISTIO_ENABLED
+              value: "false"
+            - name: ISTIO_READINESS_PORT
+              value: "8888"
+            - name: WDT_VERSION
+              value: 
+      volumes:
+        - name: create-weblogic-sample-domain-job-cm-volume
+          configMap:
+            name: wls14-domain-create-weblogic-sample-domain-job-cm
+        - name: weblogic-sample-domain-storage-volume
+          persistentVolumeClaim:
+            claimName: weblogic-fourteen-pvc
+        - name: weblogic-credentials-volume
+          secret:
+            secretName: weblogic-credentials
+      imagePullSecrets:
+      - name: contsecret

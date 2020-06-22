@@ -1,0 +1,37 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-pathrouting-1
+  namespace: soa-ns
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/rewrite-target: /console
+    ingress.kubernetes.io/rule-type: PathPrefix
+spec:
+  rules:
+  - host:
+    http:
+      paths:
+      - path: /soadomain
+        backend:
+          serviceName: soadomain-adminserver-external
+          servicePort: 7001
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: traefik-pathrouting-2
+  namespace: soa-ns
+  annotations:
+    kubernetes.io/ingress.class: traefik
+    ingress.kubernetes.io/rewrite-target: /em
+    ingress.kubernetes.io/rule-type: PathPrefix
+spec:
+  rules:
+  - host:
+    http:
+      paths:
+      - path: /soadomain
+        backend:
+          serviceName: soadomain-adminserver-external
+          servicePort: 7001

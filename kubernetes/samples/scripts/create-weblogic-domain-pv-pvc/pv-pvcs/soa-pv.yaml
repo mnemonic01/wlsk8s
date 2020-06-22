@@ -1,0 +1,22 @@
+# Copyright (c) 2018, 2020, Oracle Corporation and/or its affiliates.
+# Licensed under the Universal Permissive License v 1.0 as shown at https://oss.oracle.com/licenses/upl.
+
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: soa-pv
+  labels:
+    weblogic.resourceVersion: domain-v2
+    # weblogic.domainUID: 
+spec:
+  storageClassName: soa-storage-class
+  capacity:
+    storage: 20Gi
+  accessModes:
+    - ReadWriteMany
+  # Valid values are Retain, Delete or Recycle
+  persistentVolumeReclaimPolicy: Retain
+  # hostPath:
+  nfs:
+    server: 10.0.10.16
+    path: "/scratch"

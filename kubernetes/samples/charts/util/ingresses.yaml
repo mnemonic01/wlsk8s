@@ -1,0 +1,29 @@
+apiVersion: v1
+items:
+- apiVersion: voyager.appscode.com/v1beta1
+  kind: Ingress
+  metadata:
+    annotations:
+      ingress.appscode.com/affinity: cookie
+      ingress.appscode.com/stats: "true"
+      ingress.appscode.com/type: NodePort
+    creationTimestamp: "2020-06-19T12:24:48Z"
+    generation: 1
+    name: host-routing
+    namespace: default
+    resourceVersion: "21616981"
+    selfLink: /apis/voyager.appscode.com/v1beta1/namespaces/default/ingresses/host-routing
+    uid: d128af71-e677-42f6-ab43-e3f0cb994922
+  spec:
+    rules:
+    - host: elasticsearch.default.svc.cluster.local
+      http:
+        nodePort: "31183"
+        paths:
+        - backend:
+            serviceName: kibana
+            servicePort: "5601"
+kind: List
+metadata:
+  resourceVersion: ""
+  selfLink: ""
