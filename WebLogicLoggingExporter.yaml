@@ -1,0 +1,7 @@
+weblogicLoggingIndexName: wls
+publishHost: elasticsearch.default.svc.cluster.local
+publishPort: 9200
+domainUID: soaosbdomain
+weblogicLoggingExporterEnabled: true
+weblogicLoggingExporterSeverity: TRACE
+weblogicLoggingExporterBulkSize: 1
